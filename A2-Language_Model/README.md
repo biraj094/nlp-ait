@@ -26,4 +26,6 @@ The application uses **Streamlit** to provide a web interface.
 
 
 ## Video Demo
-<video src="./A2-demo.mp4" width="100%" controls></video>
+The video is in A2-demo.mp4 for reference. I have added a gif because loading in github's Readme is causing some issue. 
+
+![Project Demo](a2.gif)
