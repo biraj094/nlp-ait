@@ -3,7 +3,7 @@
 This application demonstrates two different LSTM architectures trained on the King James Bible to perform next-word prediction and text generation.
 
 ## Project Structure
-- `bible.ipynb`: Notebook showing the working of the assignment. Training code along with result interpretation is presented in the notebook. 
+- `bible.ipynb`: Notebook showing the working of the assignment. Training code along with result interpretation is presented in the notebook. `bible.pdf` is a downloaded ipynb for easier access. 
 - `app.py`: Streamlit application containing model architectures and UI logic.
 - `best_basic_lstm.pt`: Trained weights for the standard LSTM - Baseline.
 - `best_attn_lstm.pt`: Trained weights for the Causal Masked Attention LSTM - ImprovedAttention.
