@@ -26,4 +26,4 @@ The application uses **Streamlit** to provide a web interface.
 
 
 ## Video Demo
-<video src="A2-demo.mp4" width="100%" controls></video>
+<video src="./A2-demo.mp4" width="100%" controls></video>
