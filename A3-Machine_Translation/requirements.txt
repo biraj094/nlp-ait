@@ -1,0 +1,4 @@
+torch==2.1.0
+streamlit
+indic-nlp-library==0.92
+torchtext==0.16.0
