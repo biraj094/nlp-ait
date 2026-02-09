@@ -145,3 +145,6 @@ Matplotlib has some issue displaying devnagari fonts. It was difficult getting t
 ## Web App
 
 
+A screenshot of the web app can be seen below. The .mov file has the demo. 
+
+![WebAppDemo](./screen3.png)
