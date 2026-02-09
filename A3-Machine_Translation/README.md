@@ -10,6 +10,24 @@ For this assignment, we are supposed to train two models, using dataset from our
 2. The files are large so please use [this](https://drive.google.com/drive/folders/1aSoUWQzLXaOiwSzPuFzOdgx-O46pXsY0?usp=sharing) link to download.Ensure all `.pt` and `.pkl` files are in the same directory as `app.py`. 
 3. Run the app: `streamlit run app.py`
 
+## File Structure and Content
+
+This section describes the purpose and content of each file in the `A3-Machine_Translation` directory:
+
+| File | Description |
+| :--- | :--- |
+| **`app.py`** | Streamlit web application that provides an interactive interface for English-to-Nepali translation. It loads pre-trained models (General or Additive Attention) and allows users to input English text to get Nepali translations. |
+| **`a3.ipynb`** | Main Jupyter notebook containing the complete machine translation pipeline: dataset preprocessing, model architecture definitions (Encoder, Decoder, Attention mechanisms), training loops for both General and Additive attention models, and model evaluation. |
+| **`a3-viz.ipynb`** | Visualization notebook used for generating attention maps and analyzing model behavior. Contains code for visualizing how the attention mechanism focuses on different parts of the source sentence during translation. |
+| **`requirements.txt`** | Python package dependencies required to run the project: PyTorch, Streamlit, IndicNLP library for tokenization, and torchtext for text processing utilities. |
+| **`vocab_transform.pkl`** | Pickle file containing the vocabulary transformers for both English and Nepali languages. Includes word-to-index mappings and special tokens (`<sos>`, `<eos>`, `<unk>`, `<pad>`) used during tokenization and model inference. |
+| **`Additive_Attention_best.pt`** | PyTorch model checkpoint file containing the best trained model using Additive (Bahdanau) attention mechanism. This file needs to be downloaded from the Google Drive link mentioned in Setup Instructions. Download instruction  above.| 
+| **`General_Attention_best.pt`** | PyTorch model checkpoint file containing the best trained model using General (Luong) attention mechanism. This file needs to be downloaded from the Google Drive link mentioned in Setup Instructions. Download instruction above|
+| **`a3.pdf`** | PDF export of the main training notebook (`a3.ipynb`) for easy viewing and sharing. |
+| **`a3-viz.pdf`** | PDF export of the visualization notebook (`a3-viz.ipynb`) for easy viewing and sharing. |
+| **`a3.mov`** | Video demonstration file showing the web application in use, demonstrating the translation functionality. |
+| **`README.md`** | This documentation file containing project overview, setup instructions, experimental details, results, and file descriptions. |
+
 ## Dataset and Tokenizer library
 I used [this github repository](https://github.com/sharad461/nepali-translator?tab=readme-ov-file) to source translation pair data. [This drive link](https://drive.google.com/file/d/1UThfJKJFvDgTu263DNbz-WPNLqoARZ_0/view) contains the relevant file that has been used. Please refer train.en and train.ne . These two files must be in the working directory to run the notebook. Thankyou to [Sharad Duwal](https://github.com/sharad461) for providing the dataset. 
 
@@ -148,3 +166,4 @@ Matplotlib has some issue displaying devnagari fonts. It was difficult getting t
 A screenshot of the web app can be seen below. The .mov file has the demo. 
 
 ![WebAppDemo](./screen3.png)
+![Project Demo](a2.gif)
