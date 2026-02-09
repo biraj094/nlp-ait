@@ -41,7 +41,7 @@ The following experimentation were done while processing the dataset and the lea
 2. IndicNLP is actually a python library that supports Indian languages. Since Nepali language share the same etymology as Indian language i.e Devanagari script, I planned to use this library. Turns out it works perfectly. A Nepali language tokenizer would ideally be better, but for experimentation purposes, this library works too. 
 3. While creating a <code>DataLoader</code>, an issue was found. The dataset contains very long sequence of text in a single line. This caused model training in Puffer to raise <code>OutOfMemory</code> error a lot. Thus, the  <code>tensor_transform</code> function has been changed to accomodate this issue. The solution was simple, to limit single sentence to 'x' tokens. In my case I set the <code>MAX_LEN = 100 </code>.
 4. Additionally, to ensure no <code>OutOfMemory</code> error, the <code>collate_batch</code> function now supports explicit type conversion to <code>.long()</code> (alias to <code>torch.int64</code>). This ensures that even if <code>autocast</code> is running, the specific tensors stay as integers. The autocast was used because training was done in Puffer (Nvidia RTX 2080 Ti). With less, VRAM this had to be done. 
-5. A high <code>min_freq=20</code> was used for Nepali tokens. A higher value reduces model's memory usage and prevents it from trying to learn rare words or 'noise' that appear too infrequently to be useful. Refer the table below:
+5. A high <code>min_freq=20</code> was used for Nepali tokens. A higher value reduces model's memory usage and prevents it from trying to learn rare words or 'noise' that appear too infrequently to be useful. Since, we are using a higher value here, the translation may not work 100%. However, it proves that with enough data and enough computing power, translation task can easily be done.  Refer the table below:
 
 **Total Tokens for Nepali dataset:** 1,679,279  
 **Total Unique Words (Raw) for Nepali dataset:** 137,851  
@@ -165,5 +165,4 @@ Matplotlib has some issue displaying devnagari fonts. It was difficult getting t
 
 A screenshot of the web app can be seen below. The .mov file has the demo. 
 
-![WebAppDemo](./screen3.png)
 ![Project Demo](a3-demo-gif.gif)
