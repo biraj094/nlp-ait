@@ -54,3 +54,46 @@ To make training efficient on the GPU, we used:
 * **Mixed Precision (AMP):** This sped up the math calculations on the CUDA device.
 
 > **Result:** This architecture allows the model to learn "Sentence Embeddings." This is much more powerful than standard BERT for tasks like searching through millions of documents because you can pre-calculate the "meaning" of every sentence once and compare them instantly.
+
+
+# Task 3: Evaluation and Inference
+
+In the final task, the Siamese BERT model was evaluated on the SNLI/MNLI test sets to measure its ability to generalize logical reasoning across unseen sentence pairs.
+
+### 1. Training & Convergence
+The model was fine-tuned for 2 epochs using a Siamese architecture. The training utilized Gradient Accumulation to maintain an effective batch size of 32.
+
+![Task 2 Training](./t2-train.png)
+
+* **Final Validation Accuracy:** 38.12%
+* **Final Validation Loss:** 1.0821
+
+### 2. Quantitative Results
+The classification report provides a detailed breakdown of the model's performance across the three logical categories: **Entailment**, **Neutral**, and **Contradiction**.
+
+![Classification Report](./t2-report.png)
+
+| Category | Precision | Recall | F1-Score | Support |
+| :--- | :--- | :--- | :--- | :--- |
+| **Entailment** | 0.46 | 0.20 | 0.28 | 1713 |
+| **Neutral** | 0.38 | 0.52 | 0.44 | 1626 |
+| **Contradiction** | 0.35 | 0.44 | 0.39 | 1661 |
+| **Total Accuracy** | | | **0.38** | 5000 |
+
+
+
+### 3. Qualitative Inference
+The model was tested with custom sentence pairs to observe its predictive behavior. 
+
+![Inference Results](./t2-inf.png)
+
+| Premise | Hypothesis | Prediction |
+| :--- | :--- | :--- |
+| A person is outdoors. | A man is walking in the park. | **Neutral** |
+| The cat is sleeping on the sofa. | The cat is running outside. | **Entailment** |
+| Two men are playing soccer. | People are engaging in a sport. | **Contradiction** |
+
+### 4. Interpretation
+* **Performance:** The accuracy of ~38% is slightly above a random baseline (33.3%), indicating the model has begun to learn semantic relationships despite the limited training epochs and small dataset subset.
+* **Bias:** The high recall for **Neutral** (0.52) suggests the model currently defaults to "Neutral" when it is uncertain about the logical link. 
+* **Logical Confusion:** In the custom examples, the model struggled with contradictions (predicting "Entailment" for a cat sleeping vs. running). This suggests that while the BERT backbone understands the tokens, the Siamese classifier requires more training data to properly weight "opposite" semantic vectors.
