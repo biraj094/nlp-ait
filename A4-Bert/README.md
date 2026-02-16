@@ -39,7 +39,7 @@ In this task, we adapted the pre-trained BERT model from Task 1 into a **Siamese
 
 I used the **SNLI** and **MNLI** datasets, which consist of sentence pairs labeled as **Entailment** (follows logically), **Neutral**, or **Contradiction**. Instead of feeding both sentences into BERT at once, we used a "Siamese" approach to create independent mathematical representations (embeddings) for each sentence.
 
-### 2. The Siamese Class (Simple English)
+### SiameseBERT
 The `SiameseBERT` class acts like a "Twin" architecture:
 * **Shared Model:** It uses one single BERT model (the one we trained in Task 1) to look at the first sentence and then the second sentence. 
 * **Mean Pooling:** BERT gives us a vector for every word. The "Pooling" step averages all those words together to get one single vector that represents the "essence" of the whole sentence.
@@ -48,7 +48,7 @@ The `SiameseBERT` class acts like a "Twin" architecture:
 
 
 
-### 3. Training and Strategy
+### Training and Strategy
 To make training efficient on the GPU, we used:
 * **Gradient Accumulation:** This allowed me to simulate a large batch size (32) even while processing smaller chunks (4) to prevent "Out of Memory" errors.
 * **Mixed Precision (AMP):** This sped up the math calculations on the CUDA device.
