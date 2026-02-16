@@ -97,3 +97,12 @@ The model was tested with custom sentence pairs to observe its predictive behavi
 * **Performance:** The accuracy of ~38% is slightly above a random baseline (33.3%), indicating the model has begun to learn semantic relationships despite the limited training epochs and small dataset subset.
 * **Bias:** The high recall for **Neutral** (0.52) suggests the model currently defaults to "Neutral" when it is uncertain about the logical link. 
 * **Logical Confusion:** In the custom examples, the model struggled with contradictions (predicting "Entailment" for a cat sleeping vs. running). This suggests that while the BERT backbone understands the tokens, the Siamese classifier requires more training data to properly weight "opposite" semantic vectors.
+
+
+
+## Web App
+
+
+A screenshot of the web app can be seen below. The .mov file has the demo. 
+
+![Project Demo](a4-demo-gif.gif)
