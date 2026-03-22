@@ -4,3 +4,4 @@
 [A3](./A3-Machine_Translation/) -  Machine Translation <br>
 [A4](./A4-Bert/) -  Bert <br>
 [A5](./A5-LLM_As_Judge/) - Human Preference & LLM as Judge<br>
+[A6](./A6-RAG) - RAG Technique <br>
