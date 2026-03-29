@@ -1,0 +1,106 @@
+{
+  "name": "MCPServer",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "720236dd-2e32-4d7f-a0a9-68814c564f30"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [
+        -48,
+        0
+      ],
+      "id": "3abf3533-dc89-4a5e-8ab4-dbd6994cf1d0",
+      "name": "MCP Server Trigger",
+      "webhookId": "720236dd-2e32-4d7f-a0a9-68814c564f30",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        144,
+        208
+      ],
+      "id": "43f8c5e9-6854-41df-8632-b49572968e78",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTimeTool",
+      "typeVersion": 2,
+      "position": [
+        48,
+        208
+      ],
+      "id": "310cc44f-8c4f-4bb4-8cd0-8649e6e77902",
+      "name": "Date & Time"
+    },
+    {
+      "parameters": {
+        "value": "{{ $json.text }}"
+      },
+      "type": "n8n-nodes-base.cryptoTool",
+      "typeVersion": 2,
+      "position": [
+        256,
+        192
+      ],
+      "id": "eb4c2a52-b5dc-4913-8dfc-b9c7c97e0544",
+      "name": "Crypto"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crypto": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "b964b779-05f5-43ea-a91a-5a2bbf3d666e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ac78be040700ad53381b6c974fed9d6a42550f9b96635d075f9ca9286125e227"
+  },
+  "id": "ZIJIPel6d8dhGStd",
+  "tags": []
+}

@@ -1,0 +1,442 @@
+{
+  "name": "T2 copy",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8580a46c-62e3-4790-a6b6-fcca9b1e3f24",
+      "name": "Telegram Trigger",
+      "webhookId": "e588d56d-fb30-44f1-9e43-f71fe9d5085a",
+      "credentials": {
+        "telegramApi": {
+          "id": "eW014juMnSWbyrDE",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "You are a scheduling assistant. Always return ONLY a raw JSON object — no prose, no markdown.\n\nIf the user wants to CREATE events, return:\n{\n  \"intent\": \"create\",\n  \"events\": [\n    { \"summary\": \"...\", \"start\": \"2026-04-25T09:00:00+07:00\", \"end\": \"2026-04-25T10:00:00+07:00\" }\n  ]\n}\n\nIf the user wants to VERIFY or LIST events, return:\n{\n  \"intent\": \"verify\",\n  \"dateFrom\": \"2026-04-01\",\n  \"dateTo\": \"2026-05-31\"\n}\n\nToday is {{ $now.format('yyyy-MM-dd') }}. Infer all dates from context."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        176,
+        0
+      ],
+      "id": "dadf580e-5b98-47bd-8c11-a7807dec6dd6",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        80,
+        208
+      ],
+      "id": "9de1056f-771e-4703-a1b6-3ad0d501a34b",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "jaVkytHmEgoQzXoy",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 1
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        208
+      ],
+      "id": "14ce895f-8eac-4a4f-b713-3f9156b83bf0",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "st124371@ait.asia",
+          "mode": "list",
+          "cachedResultName": "st124371@ait.asia"
+        },
+        "start": "={{ $json.start }}",
+        "end": "={{ $json.end }}",
+        "additionalFields": {
+          "description": "={{ $json.summary }}",
+          "summary": "={{ $json.summary }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        1200,
+        -160
+      ],
+      "id": "4ee8955f-b553-4ff6-b6b4-6ab8344fe03f",
+      "name": "Create an event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "iJt9n73MxXKh50Ro",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        960,
+        -144
+      ],
+      "id": "b64c47b9-9512-4616-8559-a648ecc94a16",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "abe22ba1-f970-456b-b4c7-9947748ff00d",
+              "leftValue": "={{ $json.intent }}",
+              "rightValue": "create",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        624,
+        48
+      ],
+      "id": "c9df06ab-3806-440f-a82d-a1722133a5af",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "const parsed = $input.first().json;\n\n// Data is already parsed — just extract events array\nreturn parsed.events.map(event => ({ json: event }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        -128
+      ],
+      "id": "83182d77-b8ce-4ac8-ad2e-42984b153d1f",
+      "name": "Get n events"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.output;\nconst cleaned = raw.replace(/```json|```/g, '').trim();\nconst parsed = JSON.parse(cleaned);\n\n// pass the full parsed object downstream\nreturn [{ json: parsed }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        32
+      ],
+      "id": "a6f2de70-d1b7-44df-9852-db16888e330e",
+      "name": "Intent - createEvent ; showEvent"
+    },
+    {
+      "parameters": {
+        "jsCode": "const parsed = $input.first().json;\n\nreturn [{\n  json: {\n    dateFrom: parsed.dateFrom,\n    dateTo: parsed.dateTo\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        144
+      ],
+      "id": "aae18bac-b3ff-4bd4-819b-7b79fc0ecfda",
+      "name": "Get to and from Date"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "st124371@ait.asia",
+          "mode": "list",
+          "cachedResultName": "st124371@ait.asia"
+        },
+        "timeMin": "={{ $json.dateFrom }}T00:00:00+07:00",
+        "timeMax": "={{ $json.dateTo }}T23:59:59+07:00",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        1040,
+        144
+      ],
+      "id": "534b01d1-0216-46e6-bcaa-ae6e74fbdd44",
+      "name": "Get many events",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "iJt9n73MxXKh50Ro",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const events = $input.all();\n\nif (events.length === 0) {\n  return [{ json: { text: \"No events found in that date range.\" } }];\n}\n\nconst lines = events.map(e => {\n  const start = new Date(e.json.start.dateTime).toLocaleString('en-GB', {\n    timeZone: 'Asia/Bangkok',\n    dateStyle: 'medium',\n    timeStyle: 'short'\n  });\n  return `📅 ${e.json.summary} — ${start}`;\n});\n\nreturn [{ json: { text: \"Here are your events:\\n\\n\" + lines.join('\\n') } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        144
+      ],
+      "id": "7e487fe7-cf02-43da-b15d-ee655331bbcc",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1456,
+        144
+      ],
+      "id": "0f347bdb-2b05-417c-9031-b65e2a096f9f",
+      "name": "Send a text message",
+      "webhookId": "2fef7759-8c28-4e37-8b36-f1aa365ee388",
+      "credentials": {
+        "telegramApi": {
+          "id": "eW014juMnSWbyrDE",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $('Loop Over Items').items.length }} event(s) created successfully! ✅",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1072,
+        -304
+      ],
+      "id": "9659c96e-8220-4df5-a75c-dfb32ed7c253",
+      "name": "Send a text message1",
+      "webhookId": "5fab430e-9f3d-45f1-b1be-59052d9db819",
+      "credentials": {
+        "telegramApi": {
+          "id": "eW014juMnSWbyrDE",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Intent - createEvent ; showEvent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create an event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get n events",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get to and from Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get n events": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intent - createEvent ; showEvent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get to and from Date": {
+      "main": [
+        [
+          {
+            "node": "Get many events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many events": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "f8b7a422-e2f1-4eb4-9926-bbec6095c226",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ac78be040700ad53381b6c974fed9d6a42550f9b96635d075f9ca9286125e227"
+  },
+  "id": "x0Vmlh7wyMy1cbhJ",
+  "tags": []
+}

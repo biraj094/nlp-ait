@@ -2,6 +2,14 @@
 
 ## Task 1: MCP Infrastructure & Server Setup
 
+## Workflow Files
+
+The workflow files are as follows:
+
+- [Task1-MCP](./T1-AIAgent.json)
+- [Task1-AIAgent](./T1-MCPServer.json)
+- [Task2-TelegramBotGoogleCalender](./T2.json)
+
 ### Overview
 
 Two workflows were created in n8n to implement an MCP (Model Context Protocol) server and an AI agent client that communicates with it over a public internet URL via ngrok.
@@ -169,6 +177,10 @@ Routes the flow based on `intent`:
 **Example interaction:**
 
 ![Example](./t2eg.png)
+
+As a result, the events have been created in google calendar. 
+
+![Example](./cal.png)
 ---
 
 ## Key Design Decisions
