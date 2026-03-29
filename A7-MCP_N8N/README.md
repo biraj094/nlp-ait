@@ -89,3 +89,92 @@ The AI agent successfully calls MCP tools in response to user prompts:
 | Model | meta-llama/llama-4-scout-17b-16e-instruct |
 | Memory | Window Buffer (Simple Memory) |
 | Tools | Calculator, Date & Time, Crypto Hash |
+
+
+
+# Task 2 — Telegram & Google Calendar Integration
+
+## Overview
+
+An n8n workflow that connects a Telegram bot to Google Calendar via an AI Agent. Users can create calendar events or list existing ones by sending natural language messages to the bot.
+
+---
+
+## Workflow Diagram
+
+![Workflow2](./t2-w1.png)
+---
+
+## Nodes
+
+### Telegram Trigger
+Listens for incoming messages from the Telegram bot. Every message the user sends kicks off the workflow.
+
+### AI Agent
+Powered by Groq (llama model) with Simple Memory for conversation history. Reads the user's message and returns a raw JSON object identifying the intent and relevant data.
+
+**Output format — create intent:**
+```json
+{
+  "intent": "create",
+  "events": [
+    { "summary": "Phase1 Literature Review", "start": "2026-04-03T13:00:00+07:00", "end": "2026-04-03T14:00:00+07:00" }
+  ]
+}
+```
+
+**Output format — verify intent:**
+```json
+{
+  "intent": "verify",
+  "dateFrom": "2026-04-01",
+  "dateTo": "2026-04-30"
+}
+```
+
+### Intent node (Code in JavaScript)
+Parses the AI Agent's raw text output into a structured JavaScript object and passes it downstream.
+
+### IF node
+Routes the flow based on `intent`:
+- `true` → intent equals `"create"`
+- `false` → intent equals `"verify"`
+
+---
+
+## True Branch — Create Events
+
+**Triggered when:** user asks to create or schedule events.
+
+1. **Get n events (Code node)** — extracts the `events` array from the parsed object and maps each event into a separate item.
+2. **Loop Over Items** — iterates one event at a time (batch size 1), repeating until all N events are processed.
+3. **Create an event (Google Calendar)** — creates each event using `{{ $json.summary }}`, `{{ $json.start }}`, `{{ $json.end }}` mapped from the current item.
+4. **Send a text message (Telegram)** — connected to the `done` output of the loop. Fires once after all events are created and sends a confirmation message back to the user.
+
+**Example interaction:**
+> User: "Create Phase1 Literature Review on 3 April 2026 at 1pm and Phase2 Project Proposal on 13 April 2026"
+> Bot: "event(s) created successfully! ✅"
+
+---
+
+## False Branch — Verify / List Events
+
+**Triggered when:** user asks to list, check, or verify events within a date range.
+
+1. **Get to and from Date (Code node)** — extracts `dateFrom` and `dateTo` from the parsed object.
+2. **Get many events (Google Calendar: Get All)** — fetches all events between the two dates using `{{ $json.dateFrom }}` and `{{ $json.dateTo }}`.
+3. **Code in JavaScript** — formats the returned events into a readable list with event name and date/time.
+4. **Send a text message (Telegram)** — sends the formatted list back to the user.
+
+**Example interaction:**
+
+![Example](./t2eg.png)
+---
+
+## Key Design Decisions
+
+- **Dynamic event count** — the AI Agent determines how many events to create from the user's message. Nothing is hardcoded. 2 events, 4 events, or 10 — the loop handles all cases.
+- **Single workflow, two paths** — both create and verify share the same Telegram trigger and AI Agent, branching only at the IF node.
+- **Simple Memory** — gives the agent conversational context so follow-up messages (e.g. "create two more") work correctly.
+- **Dates from user input** — all start/end times are inferred by the AI Agent from the user's natural language message, converted to ISO 8601 format with `+07:00` (Asia/Bangkok) offset.
+
